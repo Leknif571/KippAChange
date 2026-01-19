@@ -1,0 +1,39 @@
+services:
+  
+  message-broker:
+    container_name: rabbitmq-kippachange
+    image: rabbitmq:management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: "user"
+      RABBITMQ_DEFAULT_PASS: "password"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - pingpong_network
+
+  bet-service:
+    build: ./MS-Bet
+    ports:
+      - "8001:80"
+    volumes:
+      - ./MS-Bet/src:/project/src
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 80 --reload --reload-dir /project/src
+    depends_on:
+      message-broker:
+        condition: service_healthy
+    networks:
+      - pingpong_network
+
+volumes:
+  rabbitmq_data:
+networks:
+  pingpong_network:
+    driver: bridge
