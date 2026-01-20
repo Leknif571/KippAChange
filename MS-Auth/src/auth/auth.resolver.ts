@@ -5,15 +5,17 @@ import { AuthService } from './auth.service';
 import { User } from './entities/user.entity';
 import { Auth } from './entities/auth.entity';
 import { CreateAuthInput } from './dto/create-auth.input';
+import { FederatedAuthGuard } from './guards/federated-auth.guard';
+import { CurrentUser } from './decorator/current-user.decorator';
 
 @Resolver(() => Auth)
 export class AuthResolver {
   constructor(private authService: AuthService) {}
 
   @Query(() => User)
-  @UseGuards(JwtAuthGuard)
-  getMe(@Context('req') req: Request & { user?: User }) {
-    return req.user;
+  @UseGuards(FederatedAuthGuard)
+  async getMe(@CurrentUser() userId: string) { 
+    return { googleId: userId, age : null, email: null, pseudo: null, role: null }; 
   }
 
   @Mutation(() => Auth)

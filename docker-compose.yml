@@ -95,7 +95,7 @@ services:
       - "3003:3003"
 
   service-gateway:
-    build: ./MS-Gateway
+    build: ./Gateway
     container_name: service_gateway
     ports:
       - "4001:4001"

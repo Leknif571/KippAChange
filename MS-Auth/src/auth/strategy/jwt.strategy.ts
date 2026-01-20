@@ -19,14 +19,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: { sub: string; email: string }) {
+  validate(payload) {
     // const user = this.authService.findById(payload.sub);
 
-    if (!payload.sub) {
-      throw new UnauthorizedException(
-        'Jeton invalide ou utilisateur non trouvé.',
-      );
-    }
+    // if (!payload.sub) {
+    //   throw new UnauthorizedException(
+    //     'Jeton invalide ou utilisateur non trouvé.',
+    //   );
+    // }
 
     return payload;
   }

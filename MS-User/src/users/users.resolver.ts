@@ -19,7 +19,6 @@ export class UsersResolver {
     const users: User[] = await this.usersService.findAll();
     return users;
   }
-
   @Query(() => User, { name: 'user' })
   async findOne(@Args('googleId') googleId: string) {
     const user: User | string = await this.usersService.findOne(googleId);
