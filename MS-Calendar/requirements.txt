@@ -1,0 +1,26 @@
+fastapi
+pika
+uvicorn[standard]
+strawberry-graphql
+httpx
+
+# Database
+sqlalchemy
+alembic
+psycopg2-binary
+asyncpg
+
+# Configuration
+python-dotenv
+pydantic-settings
+
+# Date/Time handling
+python-dateutil
+pytz
+
+# Async HTTP client
+aiohttp
+
+# Testing
+pytest
+pytest-asyncio
