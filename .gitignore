@@ -1,3 +1,2 @@
-MS-Bet/.env
+*.env
 *.pyc
-MS-Bet/uv.lock
