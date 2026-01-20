@@ -7,6 +7,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: "user"
       RABBITMQ_DEFAULT_PASS: "password"
+      RABBITMQ_ERLANG_COOKIE: "secret_cookie_kippachange_12345"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     ports:
