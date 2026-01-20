@@ -20,35 +20,15 @@ services:
     depends_on:
       - mongodb
 
-  service-auth:
-    build: ./MS-Auth
-    container_name: service_auth
-    environment:
-      - MONGO_URL=mongodb://mongodb:27017/kippachange_auth
-    depends_on:
-      - mongodb
-    ports:
-      - "3001:3001"
-
   service-user:
-    build: ./MS-User
+    build: .
     container_name: service_user
     environment:
-      - MONGO_URL=mongodb://mongodb:27017/kippachange_users
+      - MONGO_URL=mongodb://mongodb:27017/hubertapp_users
     depends_on:
       - mongodb
     ports:
       - "4000:4000"
-
-  api-gateway:
-    build: ./Gateway
-    container_name: api_gateway
-    restart : on-failure
-    depends_on:
-      - service-auth
-      - service-user
-    ports:
-      - "4001:4001"
 
 volumes:
   mongo_data:

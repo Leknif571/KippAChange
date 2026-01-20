@@ -1,0 +1,30 @@
+type User {
+    googleId: ID!
+    pseudo: String
+    age: Int
+    email: String
+    role : String
+}
+
+input CreateUserInput {
+    googleId: ID!
+    pseudo: String
+    age: Int
+    email: String
+    role : String
+}
+
+input UpdateUserInput {
+  googleId: ID!
+}
+
+type Query {
+  users: [User]!
+  user(googleId: ID!): User
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(googleId: ID!): User
+}
