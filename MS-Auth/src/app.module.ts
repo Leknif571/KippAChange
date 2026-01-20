@@ -12,7 +12,10 @@ import { ConfigModule } from '@nestjs/config';
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       playground: true,
-      typePaths: ['./**/*.graphql'],
+      // typePaths: ['./**/*.graphql'],
+      autoSchemaFile: {
+        federation: 2,
+      },
     }),
     AuthModule,
   ],

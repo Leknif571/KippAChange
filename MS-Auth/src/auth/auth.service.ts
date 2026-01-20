@@ -52,7 +52,7 @@ async findOrCreateUser(user: CreateAuthInput): Promise<any> {
   //   return user;
   // }
 
-  getJwtToken(user: User) {
+  getJwtToken(user: CreateAuthInput) {
     const payload = {
       email: user.email,
       sub: user.googleId,

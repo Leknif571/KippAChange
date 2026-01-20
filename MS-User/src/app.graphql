@@ -1,30 +1,32 @@
-type User {
-    googleId: ID!
-    pseudo: String
-    age: Int
-    email: String
-    role : String
-}
+# @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@inaccessible"])
 
-input CreateUserInput {
-    googleId: ID!
-    pseudo: String
-    age: Int
-    email: String
-    role : String
-}
+# type User {
+#     googleId: ID!
+#     pseudo: String
+#     age: Int
+#     email: String
+#     role : String
+# }
 
-input UpdateUserInput {
-  googleId: ID!
-}
+# input CreateUserInput {
+#     googleId: ID!
+#     pseudo: String
+#     age: Int
+#     email: String
+#     role : String
+# }
 
-type Query {
-  users: [User]!
-  user(googleId: ID!): User
-}
+# input UpdateUserInput {
+#   googleId: ID!
+# }
 
-type Mutation {
-  createUser(createUserInput: CreateUserInput!): User!
-  updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(googleId: ID!): User
-}
+# type Query {
+#   users: [User]!
+#   user(googleId: ID!): User
+# }
+
+# type Mutation {
+#   createUser(createUserInput: CreateUserInput!): User! @inaccessible
+#   updateUser(updateUserInput: UpdateUserInput!): User! @inaccessible
+#   removeUser(googleId: ID!): User @inaccessible
+# }

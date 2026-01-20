@@ -13,8 +13,9 @@ import { MongooseModule } from '@nestjs/mongoose';
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       playground: true,
-      typePaths: ['./**/*.graphql'],
-    }),
+     autoSchemaFile: {
+      federation: 2,
+    },}),
     MongooseModule.forRoot(
       process.env.MONGO_URL || 'mongodb://mongodb:27017/hubertapp_users',
     ),
