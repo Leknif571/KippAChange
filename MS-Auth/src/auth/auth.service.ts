@@ -13,7 +13,7 @@ export class AuthService {
 
 
 async findOrCreateUser(user: CreateAuthInput): Promise<any> {
-  const client = new GraphQLClient('http://service-user:4000/graphql');
+  const client = new GraphQLClient('http://service-user:3002/graphql');
 
   const CREATE_USER_MUTATION = gql`
     mutation CreateUser($input: CreateUserInput!) {
