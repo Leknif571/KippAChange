@@ -9,7 +9,7 @@ RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
 RABBITMQ_USER = os.getenv("RABBITMQ_USER")
 RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
 RABBITMQ_BET_EXCHANGE = os.getenv("RABBITMQ_BET_EXCHANGE")
-RABBITMQ_NOTIFICATION_EXCHANGE = os.getenv("RABBITMQ_NOTIFICATION_EXCHANGE")
+RABBITMQ_NOTIFICATION_QUEUE = os.getenv("RABBITMQ_NOTIFICATION_QUEUE")
 RABBITMQ_BET_QUEUE = os.getenv("RABBITMQ_BET_QUEUE")
 def get_rabbitmq_connection():
     credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASSWORD)
@@ -28,7 +28,7 @@ def publish_bet_on_notification_exchange(message: dict):
     try:
         connection = get_rabbitmq_connection()
         channel = connection.channel()
-        channel.basic_publish(exchange=RABBITMQ_NOTIFICATION_EXCHANGE, routing_key='', body=json.dumps(message))
+        channel.basic_publish(exchange='', routing_key=RABBITMQ_NOTIFICATION_QUEUE, body=json.dumps(message))
         print("Message publié sur l'exchange de notification :", message, flush=True)
         connection.close()
         return True
@@ -46,7 +46,7 @@ def start_consuming():
         print(" [x] Pari reçu :", body_received['data'], flush=True)
         time.sleep(2)
         create_bet(body_received['data'])
-        publish_bet_on_notification_exchange({"event": "bet_created", "data": body_received['data']})
+        publish_bet_on_notification_exchange({"pattern": "bet_created", "data": body_received['data']})
 
         
 
