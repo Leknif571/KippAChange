@@ -24,11 +24,12 @@ channel = connection.channel()
 channel.exchange_declare(exchange=RABBITMQ_BET_EXCHANGE, exchange_type='fanout')
 connection.close()
 
-def publish_bet_on_exchange(message: dict):
+def publish_bet_on_notification_exchange(message: dict):
     try:
         connection = get_rabbitmq_connection()
         channel = connection.channel()
         channel.basic_publish(exchange=RABBITMQ_NOTIFICATION_EXCHANGE, routing_key='', body=json.dumps(message))
+        print("Message publié sur l'exchange de notification :", message, flush=True)
         connection.close()
         return True
     except Exception as e:
@@ -45,7 +46,7 @@ def start_consuming():
         print(" [x] Pari reçu :", body_received['data'], flush=True)
         time.sleep(2)
         create_bet(body_received['data'])
-        publish_bet_on_exchange({"event": "bet_created", "data": body_received['data']})
+        publish_bet_on_notification_exchange({"event": "bet_created", "data": body_received['data']})
 
         
 
