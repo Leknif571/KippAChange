@@ -22,6 +22,27 @@ services:
     networks:
       - app-network
 
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongodb_visualizer
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    depends_on:
+      - mongodb
+
   ms-notifications:
     build: ./MS-Notifications
     container_name: ms-notifications-kippachange
@@ -58,9 +79,42 @@ services:
     networks:
       - app-network
 
+  service-user:
+    build: ./MS-User
+    container_name: service_user
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/kippachange_users
+    depends_on:
+      - mongodb
+    ports:
+      - "3002:3002"
+
+  service-auth:
+    build: ./MS-Auth
+    container_name: service_auth
+    ports:
+      - "3003:3003"
+
+  service-gateway:
+    build: ./Gateway
+    container_name: service_gateway
+    ports:
+      - "4001:4001"
+    depends_on:
+      - ms-notifications
+      - ms-bet
+      - service-user
+      - service-auth
+
 volumes:
   rabbitmq_data:
+  mongo_data:
 
 networks:
    app-network:
     driver: bridge
+
+
+
+
+  
