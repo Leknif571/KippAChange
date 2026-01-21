@@ -1,17 +1,21 @@
-// src/app.module.ts
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
-import { NotificationsModule } from './ms-notifications/ms-notifications.module';
+import { join } from 'path';
+import { WalletModule } from './wallet/wallet.module';
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
-      typePaths: ['./**/*.graphql'],
       playground: true,
+      // typePaths: ['./**/*.graphql'],
+      autoSchemaFile: {
+        federation: 2,
+      },
     }),
-    NotificationsModule,
+
+    WalletModule,
   ],
 })
 export class AppModule {}

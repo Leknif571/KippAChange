@@ -11,12 +11,14 @@ export class FederatedAuthGuard implements CanActivate {
     const userEmail = ctx.req.headers['x-user-email'];
     const userPseudo = ctx.req.headers['x-user-pseudo'];
     const userAge = ctx.req.headers['x-user-age'];
-    console.log("UserId from Gateway headers:", userId);
-    // const userEmail = ctx.req.headers['x-user-email'];
-    // const userPseudo = ctx.req.headers['x-user-pseudo'];
+    const authState = ctx.req.headers['x-auth-state'];
+
+    if (authState !== 'VALID') {
+      throw new UnauthorizedException('Token invalide');
+    }
 
     if (!userId) {
-      throw new UnauthorizedException('Recherche utilisateur impossible sans badge Gateway');
+      throw new UnauthorizedException('Connexion requise !');
     }
 
     ctx.req.user = { id: userId, role: userRole, email: userEmail, pseudo: userPseudo, age: userAge };

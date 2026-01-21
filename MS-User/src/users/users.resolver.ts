@@ -15,7 +15,6 @@ export class UsersResolver {
   @Query(() => User)
   @UseGuards(FederatedAuthGuard)
   async getMe(@CurrentUser() user: User) {
-    console.log("Current user in getMe:", user); 
     return { googleId: user.googleId, age : user.age, email: user.email, pseudo: user.pseudo, role: user.role }; 
   }
 

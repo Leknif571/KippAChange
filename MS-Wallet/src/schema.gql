@@ -1,0 +1,12 @@
+
+# type Query {
+#   walletByUserId(userId: String!): Wallet
+#   wallets: [Wallet!]!
+# }
+
+# type Wallet {
+#   balance: Float!
+#   currency: String!
+#   id: ID!
+#   userId: String!
+# }

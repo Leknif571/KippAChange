@@ -1,61 +1,53 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { UsersResolver } from '../../src/users/users.resolver';
 import { UsersService } from '../../src/users/users.service';
 
-describe('UsersService', () => {
+describe('UsersResolver', () => {
+  let resolver: UsersResolver;
   let service: UsersService;
+
+  const mockUsersService = {
+    findAll: jest.fn().mockResolvedValue([
+      { googleId: '1', email: 'adel@email.com', pseudo: 'Adel' }
+    ]),
+    findOne: jest.fn().mockResolvedValue({ googleId: '1', email: 'adel@email.com' }),
+    create: jest.fn().mockResolvedValue({ googleId: '1', email: 'adel@email.com' }),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService],
+      providers: [
+        UsersResolver,
+        {
+          provide: UsersService,
+          useValue: mockUsersService,
+        },
+      ],
     }).compile();
 
+    resolver = module.get<UsersResolver>(UsersResolver);
     service = module.get<UsersService>(UsersService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  test('should return "Utilisateur non trouvé" when user is not found', () => {
-    const result = service.findOne(999);
-    expect(result).toBe('Utilisateur non trouvé');
+  test('should be defined', () => {
+    expect(resolver).toBeDefined();
   });
 
-  // test('should return user when user is found', () => {
-  //   const newUser = {
-  //     id: 1,
-  //     email: 'test@test.fr',
-  //     username: 'testuser',
-  //     age: 30,
-  //     handicape: false,
-  //   };
-  //   service.create(newUser);
-  //   const result = service.findOne(1);
-  //   expect(result).toEqual(newUser);
-  // });
-
-  test('should create a new user', () => {
-    const newUser = {
-      id: 2,
-      email: 'test@test.fr',
-      username: 'testuser2',
-      age: 25,
-      handicape: true,
-    };
-    const result = service.create(newUser);
-    expect(result).toEqual(newUser);
+  test('should return all users', async () => {
+    const result = await resolver.findAll();
+    
+    expect(result).toBeInstanceOf(Array);
+    expect(mockUsersService.findAll).toHaveBeenCalled();
   });
 
-  // test('should return all users', () => {
-  //   const newUser = {
-  //     id: 2,
-  //     email: 'test@test.fr',
-  //     username: 'testuser2',
-  //     age: 25,
-  //     handicape: true,
-  //   };
-  //   service.create(newUser);
-  //   const users = service.findAll();
-  //   expect(users).toBeGreaterThan(0);
-  // });
+  test('should find one user by id', async () => {
+    const id = 'test-id';
+    await resolver.findOne(id);
+    
+    expect(mockUsersService.findOne).toHaveBeenCalledWith(id);
+  });
 });
