@@ -73,6 +73,26 @@ services:
     networks:
       - app-network
 
+  # Base de données PostgreSQL pour MS-Calendar
+  postgres-calendar:
+    container_name: postgres-calendar-kippachange
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: calendar_user
+      POSTGRES_PASSWORD: calendar_password
+      POSTGRES_DB: calendar_db
+    volumes:
+      - postgres_calendar_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U calendar_user -d calendar_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
   ms-notifications:
     build: ./MS-Notifications
     container_name: ms-notifications-kippachange
@@ -95,7 +115,6 @@ services:
       - "8001:80"
     volumes:
       - ./MS-Bet/src:/project/src
-    # Commande de démarrage (rechargement automatique activé)
     command: python -m uvicorn main:app --host 0.0.0.0 --port 80 --reload --reload-dir /project/src
     environment:
       - RABBITMQ_HOST=message-broker
@@ -145,13 +164,31 @@ services:
     networks:
       - app-network
 
+  # Microservice Calendar
+  ms-calendar:
+    build:
+      context: ./MS-Calendar
+      dockerfile: Dockerfile
+    container_name: ms-calendar-kippachange
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./MS-Calendar/src:/app/src
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://calendar_user:calendar_password@postgres-calendar:5432/calendar_db
+    depends_on:
+      message-broker:
+        condition: service_healthy
+      postgres-calendar:
+        condition: service_healthy
+    networks:
+      - app-network
+
 volumes:
   rabbitmq_data:
-  postgres_data:
-  mongo_data:
 
 networks:
-   app-network:
+  app-network:
     driver: bridge
 
 
