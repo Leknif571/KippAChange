@@ -1,4 +1,5 @@
 import strawberry
+from strawberry.federation import Schema
 from src.MBManager import publish_bet_on_notification_exchange
 
 @strawberry.type
@@ -28,15 +29,6 @@ class Mutation:
     @strawberry.mutation
     def create_bet(self, user_id: strawberry.ID, match_id: strawberry.ID, amount: float, odds: float) -> Bet:
         print("Création du pari dans la bdd")
-        publish_bet_on_notification_exchange({
-            "event": "bet_created",
-            "data": {
-                "user_id": user_id,
-                "match_id": match_id,
-                "amount": amount,
-                "odds": odds
-            }
-        })
         return Bet(
             id="1",
             user_id=user_id,
@@ -45,4 +37,4 @@ class Mutation:
             odds=odds,
             status="pending"
         )
-bet_schema = strawberry.Schema(query=Query, mutation=Mutation)
+bet_schema = Schema(query=Query, mutation=Mutation)
