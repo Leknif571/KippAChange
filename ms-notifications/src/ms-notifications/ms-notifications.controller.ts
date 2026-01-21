@@ -34,7 +34,7 @@ export class NotificationsController {
     }
   }
 
-  @EventPattern('bet_loose')
+  @EventPattern('bet_lost')
   handleBetLoose(@Payload() data: any, @Ctx() context: RmqContext) {
     console.log(`⚡️ Event [BetCreated] Reçu via RabbitMQ :`, data);
 

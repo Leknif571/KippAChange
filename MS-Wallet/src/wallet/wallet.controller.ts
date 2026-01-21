@@ -27,9 +27,9 @@ export class WalletController {
     this.walletService.creditWallet(data.user_id, data.amount);
   }
 
-  @EventPattern('bet_loose')
+  @EventPattern('bet_lost')
   async handleBetLoose(@Payload() data: { user_id: string; amount: number }) {
-    console.log(`Event received - Bet Loose. Substract ${data.amount} to ${data.user_id}`);
+    console.log(`Event received - Bet Lost. Substract ${data.amount} to ${data.user_id}`);
     this.walletService.debitWallet(data.user_id, data.amount);
   }
 
