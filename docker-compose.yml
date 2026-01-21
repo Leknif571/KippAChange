@@ -40,7 +40,7 @@ services:
       - "5672:5672"
       - "15672:15672"
     healthcheck:
-      test: rabbitmq-diagnostics -q ping
+      test: rabbitmq-diagnostics -q "check_port_connectivity"
       interval: 10s
       timeout: 10s
       retries: 10
@@ -125,6 +125,7 @@ services:
     depends_on:
       message-broker:
         condition: service_healthy
+      
 
     networks:
       - app-network

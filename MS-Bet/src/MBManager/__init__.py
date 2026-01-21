@@ -39,23 +39,3 @@ def publish_bet_on_notification_exchange(message: dict):
 def create_bet(bet_data: dict):
     print(f"Création du pari avec les données : {bet_data}", flush=True)
     
-
-def start_consuming():
-    def callback(ch, method, properties, body):
-        body_received = json.loads(body)
-        print(" [x] Pari reçu :", body_received['data'], flush=True)
-        time.sleep(2)
-        create_bet(body_received['data'])
-        publish_bet_on_notification_exchange({"pattern": "bet_created", "data": body_received['data']})
-
-        
-
-    connection = get_rabbitmq_connection()
-    channel = connection.channel()
-    result = channel.queue_declare(queue=RABBITMQ_BET_QUEUE, exclusive=False)
-    queue_name = result.method.queue
-    channel.queue_bind(exchange=RABBITMQ_BET_EXCHANGE, queue=queue_name)
-    channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
-    print(f" [*] En attente de messages sur l'exchange '{RABBITMQ_BET_EXCHANGE}' (queue: {queue_name})...", flush=True)
-    channel.start_consuming() 
-    connection.close()
