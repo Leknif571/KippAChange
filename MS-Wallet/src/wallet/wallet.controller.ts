@@ -15,9 +15,9 @@ export class WalletController {
 
   // Écoute un événement venant de MS-Bet
   @EventPattern('bet_created')
-  async handleBetCreated(@Payload() data: { user_id: string}) {
-    console.log(`Event received - Bet Created for ${data.user_id}`);
-    this.walletService.createWallet(data.user_id);
+  async handleBetCreated(@Payload() data: { user_id: string; amount: number}) {
+    console.log(`Event received - Bet Created for ${data.user_id}, Substract ${data.amount}`);
+    this.walletService.debitWallet(data.user_id, data.amount);
   }
 
   // Écoute un événement venant de MS-Bet
