@@ -2,11 +2,23 @@ import { Resolver, Query, Mutation, Args, Directive } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { UseGuards } from '@nestjs/common';
+import { FederatedAuthGuard } from './guards/federated-auth.guard';
+import { CurrentUser } from './decorator/current-user.decorator';
 import { User } from './entities/user.entity';
 
 @Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
+
+
+  @Query(() => User)
+  @UseGuards(FederatedAuthGuard)
+  async getMe(@CurrentUser() user: User) {
+    console.log("Current user in getMe:", user); 
+    return { googleId: user.googleId, age : user.age, email: user.email, pseudo: user.pseudo, role: user.role }; 
+  }
+
 
   @Directive('@inaccessible')
   @Mutation(() => User)

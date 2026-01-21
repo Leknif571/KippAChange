@@ -11,6 +11,7 @@ export class FederatedAuthGuard implements CanActivate {
     const userEmail = ctx.req.headers['x-user-email'];
     const userPseudo = ctx.req.headers['x-user-pseudo'];
     const userAge = ctx.req.headers['x-user-age'];
+    console.log("UserId from Gateway headers:", userId);
     // const userEmail = ctx.req.headers['x-user-email'];
     // const userPseudo = ctx.req.headers['x-user-pseudo'];
 
