@@ -1,19 +1,46 @@
 services:
-  
-  # Le Serveur RabbitMQ
+  db:
+    image: postgres:16-alpine
+    container_name: db_kippachange
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=kippachange_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_container
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
   message-broker:
     container_name: rabbitmq-kippachange
     image: rabbitmq:management-alpine
     environment:
       RABBITMQ_DEFAULT_USER: "user"
       RABBITMQ_DEFAULT_PASS: "password"
+      RABBITMQ_ERLANG_COOKIE: "secret_cookie_kippachange_12345"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
     healthcheck:
-      test: rabbitmq-diagnostics -q ping
+      test: rabbitmq-diagnostics -q "check_port_connectivity"
       interval: 10s
       timeout: 10s
       retries: 10
@@ -38,6 +65,31 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongodb_visualizer
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    depends_on:
+      - mongodb
     networks:
       - app-network
 
@@ -73,6 +125,43 @@ services:
     depends_on:
       message-broker:
         condition: service_healthy
+      
+
+    networks:
+      - app-network
+
+  service-user:
+    build: ./MS-User
+    container_name: service_user
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/kippachange_users
+    depends_on:
+      - mongodb
+
+    ports:
+      - "3002:3002"
+    networks:
+      - app-network
+
+  service-auth:
+    build: ./MS-Auth
+    container_name: service_auth
+    ports:
+      - "3003:3003"
+    networks:
+      - app-network
+
+  service-gateway:
+    build: ./Gateway
+    container_name: service_gateway
+    restart: on-failure
+    ports:
+      - "4001:4001"
+    depends_on:
+      - ms-notifications
+      - ms-bet
+      - service-user
+      - service-auth
     networks:
       - app-network
 
@@ -98,8 +187,12 @@ services:
 
 volumes:
   rabbitmq_data:
-  postgres_calendar_data:
 
 networks:
   app-network:
     driver: bridge
+
+
+
+
+  
