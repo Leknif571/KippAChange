@@ -14,9 +14,23 @@ export class WalletController {
   }
 
   // Écoute un événement venant de MS-Bet
+  @EventPattern('get_created')
+  async handleBetCreated(@Payload() data: { userId: string}) {
+    console.log(`Event prout - Bet Created for ${data.userId}`);
+    this.walletService.createWallet(data.userId);
+  }
+
+  // Écoute un événement venant de MS-Bet
   @EventPattern('bet_won')
   async handleBetWon(@Payload() data: { userId: string; amount: number }) {
     console.log(`Event prout - Bet Won. Add ${data.amount} to ${data.userId}`);
     this.walletService.creditWallet(data.userId, data.amount);
   }
+
+  @EventPattern('bet_loose')
+  async handleBetLoose(@Payload() data: { userId: string; amount: number }) {
+    console.log(`Event prout - Bet Won. Add ${data.amount} to ${data.userId}`);
+    this.walletService.creditWallet(data.userId, data.amount);
+  }
+
 }
