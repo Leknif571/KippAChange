@@ -57,6 +57,8 @@ async findOrCreateUser(user: CreateAuthInput): Promise<any> {
       email: user.email,
       sub: user.googleId,
       pseudo: user.pseudo,
+      role : user.role,
+      age : user.age
     };
     return this.jwtService.sign(payload);
   }

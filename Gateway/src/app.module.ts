@@ -25,7 +25,7 @@ import * as jwt from 'jsonwebtoken';
                 return {};
               }
               const decoded = jwt.verify(token, secret) as any;
-              return { userId: decoded.sub };
+              return { userId: decoded.sub, userRole: decoded.role, userEmail: decoded.email, userPseudo: decoded.pseudo , userAge: decoded.age };
             } catch (e: any) {
               console.error("Erreur JWT :", e.message);
               return {}; 
@@ -39,8 +39,8 @@ import * as jwt from 'jsonwebtoken';
           subgraphs: [
             { name : "auth", url : "http://service-auth:3003/graphql" },
             { name : "user", url : "http://service-user:3002/graphql" },
-            // { name : "calendar-match", url : "http://service-calendar-match:3006/graphql" },
-            // { name : "bet", url : "http://service-bet:3004/graphql" },
+            // { name : "calendar-match", url : "http://service-calendar-match:8000/graphql" },
+            // { name : "bet", url : "http://ms-bet:8001/graphql" },
             // { name : "wallet", url : "http://service-wallet:3005/graphql" }
           ],
         }),
@@ -48,9 +48,12 @@ import * as jwt from 'jsonwebtoken';
           return new RemoteGraphQLDataSource({
             url,
             willSendRequest({ request, context }) {
-              if (request.http && context.userId) {
+              if (request.http) {
                 request.http.headers.set('x-user-id', context.userId);
                 request.http.headers.set('x-user-role', context.userRole);
+                request.http.headers.set('x-user-email', context.userEmail);
+                request.http.headers.set('x-user-pseudo', context.userPseudo);
+                request.http.headers.set('x-user-age', context.userAge);
               }
             },
           });

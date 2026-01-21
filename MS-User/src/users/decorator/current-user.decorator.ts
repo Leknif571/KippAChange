@@ -1,6 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { CreateAuthInput } from '../dto/create-auth.input';
+import { User } from '../entities/user.entity';
+// import { CreateAuthInput } from '../dto/create-auth.input';
 
 export const CurrentUser = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
@@ -17,7 +18,7 @@ export const CurrentUser = createParamDecorator(
       throw new Error("User ID not found in request headers");
     }
 
-    const user : CreateAuthInput = {
+    const user : User = {
       googleId: userId,
       email: email,
       pseudo: pseudo,

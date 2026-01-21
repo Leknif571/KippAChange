@@ -12,11 +12,12 @@ import { CurrentUser } from './decorator/current-user.decorator';
 export class AuthResolver {
   constructor(private authService: AuthService) {}
 
-  @Query(() => User)
-  @UseGuards(FederatedAuthGuard)
-  async getMe(@CurrentUser() userId: string) { 
-    return { googleId: userId, age : null, email: null, pseudo: null, role: null }; 
-  }
+  // @Query(() => CreateAuthInput)
+  // @UseGuards(FederatedAuthGuard)
+  // async getMe(@CurrentUser() user: CreateAuthInput) {
+  //   console.log("Current user in getMe:", user); 
+  //   return { googleId: user.googleId, age : user.age, email: user.email, pseudo: user.pseudo, role: user.role }; 
+  // }
 
   @Mutation(() => Auth)
   async googleLogin(
