@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
 from contextlib import asynccontextmanager
-# from app.MBManager import start_consuming  # commenté temporairement
 
 from app.schema import schema
 from app.config import get_settings
@@ -63,4 +62,3 @@ async def health():
 @app.on_event("startup")
 async def startup_event():
     await init_db()
-    # start_consuming()  # commenté temporairement

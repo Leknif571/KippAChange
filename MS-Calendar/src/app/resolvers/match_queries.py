@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import select, and_, or_
 from sqlalchemy.orm import selectinload
 
-from app.graphql_types import Match as MatchType, MatchStatus
+from app.graphql_types import Match as MatchType, MatchStatus, MatchResult
 from app.models import Match
 from app.database import get_db_session
 
@@ -36,6 +36,7 @@ class MatchQuery:
         competition_id: Optional[int] = None,
         team_id: Optional[int] = None,
         status: Optional[MatchStatus] = None,
+        result: Optional[MatchResult] = None,
         from_date: Optional[datetime] = None,
         to_date: Optional[datetime] = None,
         limit: int = 50,
@@ -58,6 +59,8 @@ class MatchQuery:
                 )
             if status:
                 filters.append(Match.status == status.value)
+            if result:
+                filters.append(Match.result == result.value)
             if from_date:
                 filters.append(Match.match_date >= from_date)
             if to_date:
@@ -101,6 +104,33 @@ class MatchQuery:
         return await self.get_matches(
             competition_id=competition_id,
             status=MatchStatus.LIVE
+        )
+
+    @strawberry.field
+    async def get_finished_matches(
+        self,
+        competition_id: Optional[int] = None,
+        limit: int = 50 
+    ) -> List[MatchType]:
+        """Récupérer les matchs terminés"""
+        return await self.get_matches(
+            competition_id=competition_id,
+            status=MatchStatus.FINISHED,
+            limit=limit
+        )
+    
+    @strawberry.field
+    async def get_result_matches(
+        self,
+        result: MatchResult,
+        competition_id: Optional[int] = None,
+        limit: int = 50 
+    ) -> List[MatchType]:
+        """Récupérer les matchs par résultat"""
+        return await self.get_matches(
+            competition_id=competition_id,
+            result=result,
+            limit=limit
         )
 
     def _convert_to_type(self, match: Match) -> MatchType:
@@ -191,7 +221,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from app.database import get_db_session
 from app.models import Match
-from app.models.match import MatchStatus
+from app.models.match import MatchResult, MatchStatus
 
 async def get_upcoming_matches(days_ahead: int = 7, limit: int = 10):
     now = datetime.utcnow()
@@ -210,7 +240,21 @@ async def get_upcoming_matches(days_ahead: int = 7, limit: int = 10):
         )
         return q.scalars().all()
 
-async def get_live_matches():
+# async def get_live_matches():
+#     async with get_db_session() as session:
+#         q = await session.execute(
+#             select(Match)
+#             .options(
+#                 selectinload(Match.home_team),
+#                 selectinload(Match.away_team),
+#                 selectinload(Match.competition)
+#             )
+#             .where(Match.status == MatchStatus.LIVE)
+#             .order_by(Match.match_date)
+#         )
+#         return q.scalars().all()
+
+async def get_finished_matches(limit: int = 10):
     async with get_db_session() as session:
         q = await session.execute(
             select(Match)
@@ -219,7 +263,42 @@ async def get_live_matches():
                 selectinload(Match.away_team),
                 selectinload(Match.competition)
             )
-            .where(Match.status == MatchStatus.LIVE)
+            .where(Match.status == MatchStatus.FINISHED)
+            .order_by(Match.match_date.desc())
+            .limit(limit)
+        )
+        return q.scalars().all()
+    
+async def get_result_matches(result: str, limit: int = 10):
+    async with get_db_session() as session:
+        q = await session.execute(
+            select(Match)
+            .options(
+                selectinload(Match.home_team),
+                selectinload(Match.away_team),
+                selectinload(Match.competition)
+            )
+            .where(Match.result == result)
+            .order_by(Match.match_date.desc())
+            .limit(limit)
+        )
+        return q.scalars().all()
+
+async def get_bettable_matches(limit: int = 50):
+    """Retourne les matchs pariables (is_bettable=True et dans le futur)"""
+    now = datetime.utcnow()
+    async with get_db_session() as session:
+        q = await session.execute(
+            select(Match)
+            .options(
+                selectinload(Match.home_team),
+                selectinload(Match.away_team),
+                selectinload(Match.competition)
+            )
+            .where(Match.is_bettable == True)
+            .where(Match.match_date > now)
+            .where(Match.status == MatchStatus.SCHEDULED)
             .order_by(Match.match_date)
+            .limit(limit)
         )
         return q.scalars().all()

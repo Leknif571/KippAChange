@@ -25,9 +25,18 @@ class Settings(BaseSettings):
     sports_api_key: str = ""
     sports_api_url: str = ""
     
+    # RabbitMQ
+    rabbitmq_host: str = "localhost"
+    rabbitmq_user: str = "user"
+    rabbitmq_password: str = "password"
+    rabbitmq_calendar_exchange: str = "calendar_exchange"
+    rabbitmq_bet_exchange: str = "bet_exchange"
+    rabbitmq_calendar_queue: str = "calendar_queue"
+
     class Config:
         env_file = str(ENV_FILE)
         case_sensitive = False
+        extra = "ignore"  # <-- ignore les variables inconnues
 
 
 @lru_cache()

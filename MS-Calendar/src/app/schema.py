@@ -110,6 +110,12 @@ class Query:
         models = await get_live_matches()
         return [map_match(m) for m in models]
 
+    @strawberry.field
+    async def getBettableMatches(self, limit: int = 50) -> List[MatchType]:
+        """Retourne les matchs pariables (cotes définies par un trader)"""
+        from app.resolvers.match_queries import get_bettable_matches
+        models = await get_bettable_matches(limit=limit)
+        return [map_match(m) for m in models]
 
 @strawberry.type
 class Mutation:
@@ -118,6 +124,114 @@ class Mutation:
     @strawberry.field
     def ping(self) -> str:
         return "pong"
+
+    @strawberry.mutation
+    async def setMatchOdds(
+        self,
+        matchId: int,
+        homeOdds: float,
+        drawOdds: float,
+        awayOdds: float
+    ) -> MatchType:
+        """
+        Permet à un trader de définir les cotes d'un match.
+        Une fois les cotes définies, le match devient pariable.
+        """
+        from sqlalchemy import select
+        from sqlalchemy.orm import selectinload
+        from app.database import get_db_session
+        from app.models import Match
+        from app.MBManager import publish_match_bettable
+
+        async with get_db_session() as session:
+            q = await session.execute(
+                select(Match)
+                .options(
+                    selectinload(Match.home_team),
+                    selectinload(Match.away_team),
+                    selectinload(Match.competition)
+                )
+                .where(Match.id == matchId)
+            )
+            match = q.scalar_one_or_none()
+
+            if not match:
+                raise Exception(f"Match {matchId} non trouvé")
+
+            # Mettre à jour les cotes
+            match.home_odds = homeOdds
+            match.draw_odds = drawOdds
+            match.away_odds = awayOdds
+            match.is_bettable = True
+
+            await session.commit()
+            await session.refresh(match)
+
+            # Publier l'événement sur RabbitMQ pour MS-Bet
+            publish_match_bettable({
+                "id": match.id,
+                "home_team": match.home_team.name,
+                "away_team": match.away_team.name,
+                "match_date": match.match_date.isoformat(),
+                "competition": match.competition.name if match.competition else None,
+                "home_odds": match.home_odds,
+                "draw_odds": match.draw_odds,
+                "away_odds": match.away_odds,
+                "venue": match.venue,
+                "round": match.round
+            })
+
+            return map_match(match)
+
+    @strawberry.mutation
+    async def selectMatchForBet(
+        self,
+        matchId: int,
+        userId: str
+    ) -> MatchType:
+        """
+        Sélectionne un match pour parier.
+        Publie un message sur RabbitMQ pour notifier MS-Bet et MS-Notifications.
+        """
+        from sqlalchemy import select
+        from sqlalchemy.orm import selectinload
+        from app.database import get_db_session
+        from app.models import Match
+        from app.MBManager import publish_match_selected_for_bet
+
+        async with get_db_session() as session:
+            q = await session.execute(
+                select(Match)
+                .options(
+                    selectinload(Match.home_team),
+                    selectinload(Match.away_team),
+                    selectinload(Match.competition)
+                )
+                .where(Match.id == matchId)
+            )
+            match = q.scalar_one_or_none()
+
+            if not match:
+                raise Exception(f"Match {matchId} non trouvé")
+
+            if not match.is_bettable:
+                raise Exception(f"Le match {matchId} n'est pas encore pariable (cotes non définies)")
+
+            # Publier l'événement sur RabbitMQ
+            publish_match_selected_for_bet({
+                "id": match.id,
+                "home_team": match.home_team.name,
+                "away_team": match.away_team.name,
+                "match_date": match.match_date.isoformat(),
+                "competition": match.competition.name if match.competition else None,
+                "home_odds": match.home_odds,
+                "draw_odds": match.draw_odds,
+                "away_odds": match.away_odds,
+                "venue": match.venue,
+                "round": match.round
+            }, user_id=userId)
+
+            return map_match(match)
 
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)
