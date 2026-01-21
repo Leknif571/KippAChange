@@ -29,6 +29,7 @@ class Mutation:
     @strawberry.mutation
     def create_bet(self, user_id: strawberry.ID, match_id: strawberry.ID, amount: float, odds: float) -> Bet:
         print("Création du pari dans la bdd")
+        publish_bet_on_notification_exchange("Nouveau pari créé")
         return Bet(
             id="1",
             user_id=user_id,

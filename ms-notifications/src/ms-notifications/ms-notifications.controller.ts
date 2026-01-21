@@ -11,8 +11,8 @@ export class NotificationsController {
   handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     console.log(`⚡️ Event [UserCreated] Reçu via RabbitMQ :`, data);
 
-    if (data.userId && data.email) {
-      this.notificationsService.create(data.userId, `Bienvenue ${data.email} !`);
+    if (data.user_id && data.email) {
+      this.notificationsService.create(data.user_id, `Bienvenue ${data.email} !`);
     }
   }
 
@@ -20,8 +20,26 @@ export class NotificationsController {
   handleBetCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     console.log(`⚡️ Event [BetCreated] Reçu via RabbitMQ :`, data);
 
-    if (data.userId && data.matchId) {
-      this.notificationsService.create(data.userId, `Bet ${data.matchId} du joueur ${data.userId} avec la probabilité ${data.odds} à payer ${data.amount} !`);
+    if (data.user_id && data.match_id) {
+      this.notificationsService.create(data.user_id, `Bet ${data.match_id} du joueur ${data.user_id} avec la probabilité ${data.odds} à payer ${data.amount} !`);
+    }
+  }
+
+  @EventPattern('bet_won')
+  handleBetWon(@Payload() data: any, @Ctx() context: RmqContext) {
+    console.log(`⚡️ Event [BetCreated] Reçu via RabbitMQ :`, data);
+
+    if (data.user_id && data.match_id) {
+      this.notificationsService.create(data.user_id, `Bet ${data.match_id} du joueur ${data.user_id} est gagné !`);
+    }
+  }
+
+  @EventPattern('bet_loose')
+  handleBetLoose(@Payload() data: any, @Ctx() context: RmqContext) {
+    console.log(`⚡️ Event [BetCreated] Reçu via RabbitMQ :`, data);
+
+    if (data.user_id && data.match_id) {
+      this.notificationsService.create(data.user_id, `Bet ${data.match_id} du joueur ${data.user_id} est perdue !`);
     }
   }
 }
