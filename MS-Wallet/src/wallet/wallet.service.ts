@@ -53,4 +53,18 @@ export class WalletService {
     
     return wallet;
   }
+
+  debitWallet(userId: string, amount: number): Wallet {
+    // On réutilise findByUserId pour récupérer le wallet (et ça lance une erreur 404 s'il n'existe pas)
+    const wallet = this.findByUserId(userId);
+    console.log("Wallet:", wallet);
+    if(!wallet || wallet == null){
+        this.createWallet(userId);
+        console.log(`Wallet créé pour l'user ${userId} lors du crédit`);
+    }
+    wallet.balance -= amount;
+    console.log(`Wallet de ${userId} débité de ${amount}. Nouveau solde : ${wallet.balance}`);
+    
+    return wallet;
+  }
 }
