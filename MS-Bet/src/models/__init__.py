@@ -1,8 +1,9 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import DeclarativeBase
 
 # Remplacez par votre URL de connexion PostgreSQL
-DATABASE_URL = "postgresql+asyncpg://user:password@localhost/kippachange_db"
+DATABASE_URL = "postgresql+asyncpg://user:password@db/kippachange_db"
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 
