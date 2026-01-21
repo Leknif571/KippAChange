@@ -14,7 +14,7 @@ export class WalletController {
   }
 
   // Écoute un événement venant de MS-Bet
-  @EventPattern('get_created')
+  @EventPattern('bet_created')
   async handleBetCreated(@Payload() data: { userId: string}) {
     console.log(`Event prout - Bet Created for ${data.userId}`);
     this.walletService.createWallet(data.userId);
