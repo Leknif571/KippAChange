@@ -151,6 +151,20 @@ services:
     networks:
       - app-network
 
+  ms-wallet:
+    build: ./MS-Wallet
+    container_name: ms-wallet-kippachange
+    ports:
+      - "3010:3010"
+    environment:
+      - NODE_ENV=production
+      - RABBITMQ_URI=amqp://user:password@message-broker:5672
+    networks:
+      - app-network
+    depends_on:
+      message-broker:
+        condition: service_healthy
+
   service-gateway:
     build: ./Gateway
     container_name: service_gateway
@@ -160,6 +174,8 @@ services:
     depends_on:
       - ms-notifications
       - ms-bet
+      - ms-calendar
+      - ms-wallet
       - service-user
       - service-auth
     networks:

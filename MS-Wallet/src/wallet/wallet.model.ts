@@ -1,7 +1,7 @@
-// src/wallet/wallet.model.ts
-import { Field, Float, ID, ObjectType } from '@nestjs/graphql';
+import { Directive, Field, Float, ID, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
+@Directive('@key(fields: "id")')
 export class Wallet {
   @Field(() => ID)
   id: string;
@@ -14,4 +14,16 @@ export class Wallet {
 
   @Field()
   currency: string;
+}
+
+@ObjectType()
+@Directive('@extends')
+@Directive('@key(fields: "googleId")')
+export class User {
+  @Field(() => ID)
+  @Directive('@external')
+  googleId: string;
+
+  @Field(() => Wallet, { nullable: true })
+  wallet?: Wallet;
 }

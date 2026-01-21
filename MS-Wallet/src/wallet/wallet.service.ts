@@ -3,7 +3,6 @@ import { Wallet } from './wallet.model';
 
 @Injectable()
 export class WalletService {
-  // Simulation de BDD
   private wallets: Wallet[] = [
     { id: '1', userId: 'user123', balance: 150.50, currency: 'EUR' },
     { id: '2', userId: 'user456', balance: 2000.00, currency: 'USD' },
@@ -31,7 +30,7 @@ export class WalletService {
     const newWallet: Wallet = {
       id: Math.random().toString(36).substring(7),
       userId: userId,
-      balance: 0, // Un nouveau wallet commence à 0
+      balance: 0, 
       currency: 'EUR',
     };
 
@@ -41,7 +40,6 @@ export class WalletService {
   }
 
   creditWallet(userId: string, amount: number): Wallet {
-    // On réutilise findByUserId pour récupérer le wallet (et ça lance une erreur 404 s'il n'existe pas)
     const wallet = this.findByUserId(userId);
     console.log("Wallet:", wallet);
     if(!wallet || wallet == null){
@@ -55,7 +53,6 @@ export class WalletService {
   }
 
   debitWallet(userId: string, amount: number): Wallet {
-    // On réutilise findByUserId pour récupérer le wallet (et ça lance une erreur 404 s'il n'existe pas)
     const wallet = this.findByUserId(userId);
     console.log("Wallet:", wallet);
     if(!wallet || wallet == null){

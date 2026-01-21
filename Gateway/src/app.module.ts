@@ -51,6 +51,7 @@ import * as jwt from 'jsonwebtoken';
             { name: "user", url: "http://service-user:3002/graphql" },
             { name: "calendar-match", url: "http://ms-calendar:8000/graphql" },
             { name: "bet", url: "http://ms-bet:80/graphql" },
+            { name: "wallet", url: "http://ms-wallet:3010/graphql" },
           ],
         }),
         buildService({ url }) {
