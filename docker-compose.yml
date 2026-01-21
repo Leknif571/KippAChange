@@ -55,6 +55,8 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - app-network
 
   mongo-express:
     image: mongo-express:latest
@@ -68,6 +70,8 @@ services:
       - ME_CONFIG_BASICAUTH_PASSWORD=pass
     depends_on:
       - mongodb
+    networks:
+      - app-network
 
   ms-notifications:
     build: ./MS-Notifications
@@ -114,18 +118,24 @@ services:
       - MONGO_URL=mongodb://mongodb:27017/kippachange_users
     depends_on:
       - mongodb
+
     ports:
       - "3002:3002"
+    networks:
+      - app-network
 
   service-auth:
     build: ./MS-Auth
     container_name: service_auth
     ports:
       - "3003:3003"
+    networks:
+      - app-network
 
   service-gateway:
     build: ./Gateway
     container_name: service_gateway
+    restart: on-failure
     ports:
       - "4001:4001"
     depends_on:
@@ -133,6 +143,8 @@ services:
       - ms-bet
       - service-user
       - service-auth
+    networks:
+      - app-network
 
 volumes:
   rabbitmq_data:

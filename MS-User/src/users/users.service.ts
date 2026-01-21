@@ -1,13 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UsersRepository } from './repository/users.repository';
 import { User } from './entities/user.entity';
+import { ClientProxy } from '@nestjs/microservices/client/client-proxy';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class UsersService {
 
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    @Inject('NOTIF_SERVICE') private readonly client: ClientProxy) {}
+
+
+    async sendNotification(payload: any) {
+        try {
+          await lastValueFrom(
+            this.client.emit('user_created', payload)
+          );
+          console.log("Message envoyé à RabbitMQ");
+        } catch (error) {
+          console.error("Erreur RabbitMQ:", error);
+        }
+      }
 
   async create(createUserInput: CreateUserInput) {
 
@@ -15,6 +31,25 @@ export class UsersService {
 
     if (typeof userExistent === 'string') {
       await this.usersRepository.create(createUserInput);
+
+      let body_received = {
+        "pattern": "user_created",
+        "data": {
+          "googleId": createUserInput.googleId,
+          "email": createUserInput.email,
+          "pseudo": createUserInput.pseudo,
+          "age": createUserInput.age,
+          "role": createUserInput.role
+        }
+      };
+
+      console.log(body_received); 
+      await this.sendNotification(JSON.stringify(body_received)).catch((error) => {
+        console.error("Erreur lors de l'envoi de la notification : " + error);
+      });
+
+      console.log("ZOZO");
+
       return createUserInput;
     }
 
