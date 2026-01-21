@@ -52,3 +52,24 @@ mutation {
     }
 }
 ```
+
+
+## Scénario métier
+
+Création d'un match>Trader dépose une côte>Utilisateur fait un pari sur ce match>Trader mets les résultats du match
+
+Events : 
+- Création d'un match:
+    - Match créé en bdd
+- Trader dépose une côte:
+    - Côte modifiée sur le match en question
+- Utilisateur fait un pari sur ce match:
+    - Pari créé en bdd
+    - Soustraction du montant du pari par rapport au montant du wallet
+    - Notification envoyée "Pari créé"
+- Trader mets les résultats du match:
+    - Score modifié sur le match en question
+    - Modification du résultat du pari
+    - Ajout d'argent dans wallet pari gagné
+    - Notification envoyée "Pari gagné/perdu"
+
