@@ -48,8 +48,6 @@ export class UsersService {
         console.error("Erreur lors de l'envoi de la notification : " + error);
       });
 
-      console.log("ZOZO");
-
       return createUserInput;
     }
 
