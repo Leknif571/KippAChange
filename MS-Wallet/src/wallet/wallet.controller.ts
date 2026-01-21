@@ -10,27 +10,27 @@ export class WalletController {
   @EventPattern('user_created')
   async handleUserCreated(@Payload() data: any) {
     console.log('Event received - User Created:', data);
-    this.walletService.createWallet(data.userId);
+    this.walletService.createWallet(data.user_id);
   }
 
   // Écoute un événement venant de MS-Bet
   @EventPattern('bet_created')
-  async handleBetCreated(@Payload() data: { userId: string}) {
-    console.log(`Event received - Bet Created for ${data.userId}`);
-    this.walletService.createWallet(data.userId);
+  async handleBetCreated(@Payload() data: { user_id: string}) {
+    console.log(`Event received - Bet Created for ${data.user_id}`);
+    this.walletService.createWallet(data.user_id);
   }
 
   // Écoute un événement venant de MS-Bet
   @EventPattern('bet_won')
-  async handleBetWon(@Payload() data: { userId: string; amount: number }) {
-    console.log(`Event received - Bet Won. Add ${data.amount} to ${data.userId}`);
-    this.walletService.creditWallet(data.userId, data.amount);
+  async handleBetWon(@Payload() data: { user_id: string; amount: number }) {
+    console.log(`Event received - Bet Won. Add ${data.amount} to ${data.user_id}`);
+    this.walletService.creditWallet(data.user_id, data.amount);
   }
 
   @EventPattern('bet_loose')
-  async handleBetLoose(@Payload() data: { userId: string; amount: number }) {
-    console.log(`Event received - Bet Loose. Substract ${data.amount} to ${data.userId}`);
-    this.walletService.creditWallet(data.userId, data.amount);
+  async handleBetLoose(@Payload() data: { user_id: string; amount: number }) {
+    console.log(`Event received - Bet Loose. Substract ${data.amount} to ${data.user_id}`);
+    this.walletService.creditWallet(data.user_id, data.amount);
   }
 
 }
