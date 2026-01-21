@@ -177,6 +177,12 @@ services:
       - ./MS-Calendar/src:/app/src
     environment:
       - DATABASE_URL=postgresql+asyncpg://calendar_user:calendar_password@postgres-calendar:5432/calendar_db
+      - RABBITMQ_HOST=message-broker
+      - RABBITMQ_USER=user
+      - RABBITMQ_PASSWORD=password
+      - RABBITMQ_CALENDAR_EXCHANGE=calendar_exchange
+      - RABBITMQ_BET_EXCHANGE=bet_exchange
+      - RABBITMQ_MATCH_FINISHED_QUEUE=match_finished_queue
     depends_on:
       message-broker:
         condition: service_healthy
@@ -187,12 +193,11 @@ services:
 
 volumes:
   rabbitmq_data:
+  postgres_calendar_data:
+  mongo_data:
+  postgres_data:
 
 networks:
   app-network:
     driver: bridge
 
-
-
-
-  

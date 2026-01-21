@@ -9,7 +9,6 @@ class MatchStatus(str, enum.Enum):
     SCHEDULED = "SCHEDULED"
     LIVE = "LIVE"
     FINISHED = "FINISHED"
-    FINISHED = "FINISHED"
     POSTPONED = "POSTPONED"
     CANCELLED = "CANCELLED"
 

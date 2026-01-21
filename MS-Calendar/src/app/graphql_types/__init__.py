@@ -8,6 +8,7 @@ from .calendar_types import (
     UpdateMatchInput,
     UpdateScoreInput,
 )
+from app.graphql_types.match_result import MatchResult, FinishMatchInput, FinishMatchPayload
 
 __all__ = [
     "Sport",
@@ -18,4 +19,7 @@ __all__ = [
     "CreateMatchInput",
     "UpdateMatchInput",
     "UpdateScoreInput",
+    "MatchResult",
+    "FinishMatchInput",
+    "FinishMatchPayload",
 ]
