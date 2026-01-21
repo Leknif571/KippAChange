@@ -39,8 +39,8 @@ import * as jwt from 'jsonwebtoken';
           subgraphs: [
             { name : "auth", url : "http://service-auth:3003/graphql" },
             { name : "user", url : "http://service-user:3002/graphql" },
-            // { name : "calendar-match", url : "http://service-calendar-match:8000/graphql" },
-            // { name : "bet", url : "http://ms-bet:8001/graphql" },
+            { name : "calendar-match", url : "http://ms-calendar:8000/graphql" },
+            { name : "bet", url : "http://ms-bet:80/graphql" },
             // { name : "wallet", url : "http://service-wallet:3005/graphql" }
           ],
         }),

@@ -1,6 +1,7 @@
 import strawberry
 from datetime import datetime
 from typing import Optional, Any, List
+from strawberry.federation import Schema
 
 
 def _get_score_from_model(model, *names, default: int = 0) -> int:
@@ -234,4 +235,4 @@ class Mutation:
             return map_match(match)
 
 
-schema = strawberry.Schema(query=Query, mutation=Mutation)
+schema = Schema(query=Query, mutation=Mutation)
