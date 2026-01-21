@@ -15,7 +15,7 @@ export class FederatedAuthGuard implements CanActivate {
     // const userPseudo = ctx.req.headers['x-user-pseudo'];
 
     if (!userId) {
-      throw new UnauthorizedException('Recherche utilisateur impossible sans badge Gateway');
+      throw new UnauthorizedException('Token invalide');
     }
 
     ctx.req.user = { id: userId, role: userRole, email: userEmail, pseudo: userPseudo, age: userAge };
